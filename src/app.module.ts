@@ -3,12 +3,14 @@ import { UserModule } from './user/user.module';
 import { APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
+import { ExpensesModule } from './expenses/expenses.module';
 
 @Module({
   imports: [
     UserModule,
     MongooseModule.forRoot('mongodb://localhost:27017/wallet_watch'),
     AuthModule,
+    ExpensesModule,
   ],
   providers: [
     {
