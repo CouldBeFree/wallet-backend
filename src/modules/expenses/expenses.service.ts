@@ -74,7 +74,7 @@ export class ExpensesService {
     return response;
   }
 
-  async removeExpense(id: string): Promise<IncomesCategoriesDto[]> {
+  async removeExpense(id: string) {
     return this.expense.findByIdAndDelete(id);
   }
 }

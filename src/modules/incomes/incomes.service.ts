@@ -4,7 +4,6 @@ import { IncomeCategory } from './schemas/IncomeCategory.schema';
 import { Model } from 'mongoose';
 import { ExpensesCategoriesDto } from '../expenses/dto/expenses-categories.dto';
 import { Income } from './schemas/Income.schema';
-import { CreateExpenseCategoryDto } from '../expenses/dto/create-expense-category.dto';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { CreateIncomeResponseDto } from './dto/create-income-response.dto';
 
@@ -34,7 +33,9 @@ export class IncomesService {
       return new CreateIncomeResponseDto(
         response._id.toString(),
         response.amount,
-        response.income_category,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        response.income_category.name,
       );
     } catch (e) {
       if (e.name === 'ValidationError') {
@@ -42,6 +43,27 @@ export class IncomesService {
         throw new BadRequestException(messages.join(', '));
       }
     }
+  }
+
+  async getAllIncomes(userId: string, page: number, pageSize: number) {
+    const skip = (page - 1) * pageSize;
+    const res = await this.income
+      .find({ owner: userId })
+      .skip(skip)
+      .limit(pageSize)
+      .populate('income_category')
+      .exec();
+
+    const total = await this.income.countDocuments({ owner: userId });
+    return {
+      data: res,
+      metadata: {
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    };
   }
 
   private async getIncomeCategoryById(id: string) {
@@ -59,5 +81,9 @@ export class IncomesService {
       response.push(categoryData);
     });
     return response;
+  }
+
+  async removeExpense(incomeId: string) {
+    return this.income.findByIdAndDelete(incomeId);
   }
 }
