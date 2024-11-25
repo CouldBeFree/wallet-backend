@@ -7,7 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { jwtConstants } from '../user/constants';
+import { jwtConstants } from '../modules/user/constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -21,9 +21,10 @@ export class AuthGuard implements CanActivate {
     if (!header) return false;
     const token = header.replace('Bearer', '').trim();
     try {
-      this.jwtService.verify(token, {
+      const data = this.jwtService.verify(token, {
         secret: jwtConstants.secret,
       });
+      (request as any).user = { id: data.sub };
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException('Token has expired');

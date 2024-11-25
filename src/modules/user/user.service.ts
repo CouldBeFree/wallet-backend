@@ -62,9 +62,7 @@ export class UserService {
     return bcrypt.compare(enteredPassword, storedPassword);
   }
 
-  async getMe(token: string): Promise<GetUserDto> {
-    const decodedToken = this.jwtService.decode(token);
-    const userId = decodedToken.sub;
+  async getMe(userId: string): Promise<GetUserDto> {
     const user = await this.userModel.findById(userId);
     return new GetUserDto(user.email, user.username);
   }

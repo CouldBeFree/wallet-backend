@@ -12,7 +12,8 @@ import { UserService } from './user.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginResponseUserDto } from './dto/login-response-user.dto';
 import { GetUserDto } from './dto/get-user.dto';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthGuard } from '../../guards/auth.guard';
+import { CurrentUser } from '../../decorators/currentUser';
 
 @Controller('/api/auth')
 export class UserController {
@@ -40,8 +41,8 @@ export class UserController {
   @UseGuards(AuthGuard)
   async getMe(
     @Headers('authorization') authHeader: string,
+    @CurrentUser() userId: string,
   ): Promise<GetUserDto> {
-    const token = authHeader.replace('Bearer', '').trim();
-    return await this.userService.getMe(token);
+    return await this.userService.getMe(userId);
   }
 }
