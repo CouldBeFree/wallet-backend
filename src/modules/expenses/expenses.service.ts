@@ -58,11 +58,6 @@ export class ExpensesService {
 
   private async getExpenseCategoryById(id: string) {
     return this.expenseCategory.findById(id);
-    // try {
-    //   return await this.expenseCategory.findById(id);
-    // } catch (e) {
-    //   console.log(e);
-    // }
   }
 
   async getAllExpenseCategories(): Promise<ExpensesCategoriesDto[]> {
@@ -76,5 +71,9 @@ export class ExpensesService {
       response.push(categoryData);
     });
     return response;
+  }
+
+  async removeExpense(id: string) {
+    return this.expense.findByIdAndDelete(id);
   }
 }

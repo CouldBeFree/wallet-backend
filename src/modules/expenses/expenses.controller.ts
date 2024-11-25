@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, UseGuards, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Query,
+  Delete,
+  Param,
+  NotFoundException,
+} from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { ExpensesCategoriesDto } from './dto/expenses-categories.dto';
 import { AuthGuard } from '../../guards/auth.guard';
@@ -45,5 +55,19 @@ export class ExpensesController {
   @UseGuards(AuthGuard)
   async getCategories(): Promise<ExpensesCategoriesDto[]> {
     return await this.expenseService.getAllExpenseCategories();
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard)
+  async removeExpense(
+    @Param('id') expenseId: string,
+  ): Promise<SuccessResponse> {
+    const removedItem = await this.expenseService.removeExpense(expenseId);
+    if (removedItem) {
+      return {
+        success: true,
+      };
+    }
+    throw new NotFoundException('Expense not found');
   }
 }
