@@ -4,6 +4,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
+import { IncomesModule } from './modules/incomes/incomes.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
     MongooseModule.forRoot('mongodb://localhost:27017/wallet_watch'),
     AuthModule,
     ExpensesModule,
+    IncomesModule,
   ],
   providers: [
     {

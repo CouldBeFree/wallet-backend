@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { ExpenseCategory } from './schemas/ExpenseCategory.schema';
 import { CreateExpenseCategoryDto } from './dto/create-expense-category.dto';
 import { Expense } from './schemas/Expense.schema';
+import { IncomesCategoriesDto } from '../incomes/dto/incomes-categories.dto';
 
 @Injectable()
 export class ExpensesService {
@@ -73,7 +74,7 @@ export class ExpensesService {
     return response;
   }
 
-  async removeExpense(id: string) {
+  async removeExpense(id: string): Promise<IncomesCategoriesDto[]> {
     return this.expense.findByIdAndDelete(id);
   }
 }
