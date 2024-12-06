@@ -15,6 +15,8 @@ import { IncomesCategoriesDto } from './dto/incomes-categories.dto';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { CurrentUser } from '../../decorators/currentUser';
 import { CreateIncomeResponseDto } from './dto/create-income-response.dto';
+import { StatisticParams } from '../../decorators/statisticParams';
+import { QueryParams } from '../types';
 
 @Controller('/api/incomes')
 export class IncomesController {
@@ -39,12 +41,10 @@ export class IncomesController {
   @UseGuards(AuthGuard)
   async getAllIncomes(
     @CurrentUser() userId: string,
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string,
+    @StatisticParams() params: QueryParams,
   ) {
-    const pageNumber = parseInt(page) || 1;
-    const size = parseInt(pageSize) || 10;
-    return await this.incomesService.getAllIncomes(userId, pageNumber, size);
+    const payload = { ...params, userId };
+    return await this.incomesService.getAllIncomes(payload);
   }
 
   @Delete(':id')

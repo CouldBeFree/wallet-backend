@@ -3,7 +3,6 @@ import { StatisticService } from './statistic.service';
 import { AuthGuard } from '../../guards/auth.guard';
 import { CurrentUser } from '../../decorators/currentUser';
 import { QueryParams, StatisticPayload } from '../types';
-import getCurrentISODate from '../../utils/getCurrentISODate';
 import { StatisticParams } from '../../decorators/statisticParams';
 
 @Controller('/api/statistic')
@@ -17,13 +16,28 @@ export class StatisticController {
     @CurrentUser() userId: string,
   ) {
     const payload = { ...params, userId };
-    const res = await this.statisticService.getExpenseByDateAndCategory(
-      payload,
-    );
-    return {
-      data: res,
-      count: res.length,
-    };
+    return await this.statisticService.getExpenseByDateAndCategory(payload);
+  }
+
+  @Get('expense/total')
+  @UseGuards(AuthGuard)
+  async getAllExpenseCategories(
+    @StatisticParams() params: QueryParams,
+    @CurrentUser() userId: string,
+  ) {
+    const payload = { ...params, userId };
+    const r = await this.statisticService.getAllExpenseCategories(payload);
+    return r[0];
+  }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  async getHistory(
+    @StatisticParams() params: QueryParams,
+    @CurrentUser() userId: string,
+  ) {
+    const payload = { ...params, userId };
+    return await this.statisticService.getHistoryStatistic();
   }
 
   @Get('incomes')
@@ -33,10 +47,6 @@ export class StatisticController {
     @CurrentUser() userId: string,
   ) {
     const payload = { ...params, userId };
-    const res = await this.statisticService.getIncomeByDateAndCategory(payload);
-    return {
-      data: res,
-      count: res.length,
-    };
+    return await this.statisticService.getIncomeByDateAndCategory(payload);
   }
 }

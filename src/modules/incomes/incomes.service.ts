@@ -6,6 +6,7 @@ import { ExpensesCategoriesDto } from '../expenses/dto/expenses-categories.dto';
 import { Income } from './schemas/Income.schema';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { CreateIncomeResponseDto } from './dto/create-income-response.dto';
+import { StatisticPayload } from '../types';
 
 @Injectable()
 export class IncomesService {
@@ -45,25 +46,32 @@ export class IncomesService {
     }
   }
 
-  async getAllIncomes(userId: string, page: number, pageSize: number) {
-    const skip = (page - 1) * pageSize;
-    const res = await this.income
-      .find({ owner: userId })
-      .skip(skip)
-      .limit(pageSize)
+  async getAllIncomes(payload: StatisticPayload) {
+    const { userId, startDate, endDate } = payload;
+    // const skip = (page - 1) * pageSize;
+    return await this.income
+      .find({ owner: userId, date: { $gte: startDate, $lte: endDate } })
+      .sort({ date: -1 })
       .populate('income_category')
       .exec();
-
-    const total = await this.income.countDocuments({ owner: userId });
-    return {
-      data: res,
-      metadata: {
-        total,
-        page,
-        pageSize,
-        totalPages: Math.ceil(total / pageSize),
-      },
-    };
+    // const res = await this.income
+    //   .find({ owner: userId })
+    //   .sort({ date: -1 })
+    //   .skip(skip)
+    //   .limit(pageSize)
+    //   .populate('income_category')
+    //   .exec();
+    //
+    // const total = await this.income.countDocuments({ owner: userId });
+    // return {
+    //   data: res,
+    //   metadata: {
+    //     total,
+    //     page,
+    //     pageSize,
+    //     totalPages: Math.ceil(total / pageSize),
+    //   },
+    // };
   }
 
   private async getIncomeCategoryById(id: string) {

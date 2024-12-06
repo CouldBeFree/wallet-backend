@@ -14,6 +14,53 @@ export class StatisticService {
     private income: Model<Expense>,
   ) {}
 
+  async getHistoryStatistic() {
+    try {
+      const [expenses, incomes] = await Promise.all([
+        this.expense.find().sort({ date: -1 }).lean(),
+        this.income.find().sort({ date: -1 }).lean(),
+      ]);
+
+      return [...expenses, ...incomes];
+    } catch (error) {
+      console.error('Error fetching transaction history:', error);
+      throw error;
+    }
+  }
+
+  async getAllExpenseCategories(payload: StatisticPayload) {
+    const { userId, startDate, endDate } = payload;
+    try {
+      return this.expense.aggregate([
+        {
+          $match: {
+            date: {
+              $gte: startDate,
+              $lte: endDate,
+            },
+            owner: userId,
+          },
+        },
+        {
+          $group: {
+            _id: 'owner',
+            totalAmount: { $sum: '$amount' },
+          },
+        },
+        {
+          $project: {
+            type: 'expense',
+            _id: 0,
+            totalAmount: 1,
+          },
+        },
+      ]);
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  }
+
   async getExpenseByDateAndCategory(payload: StatisticPayload) {
     const { userId, categoryId, startDate, endDate } = payload;
     try {
