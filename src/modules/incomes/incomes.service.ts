@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { IncomeCategory } from './schemas/IncomeCategory.schema';
 import { Model } from 'mongoose';
@@ -6,7 +10,7 @@ import { ExpensesCategoriesDto } from '../expenses/dto/expenses-categories.dto';
 import { Income } from './schemas/Income.schema';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { CreateIncomeResponseDto } from './dto/create-income-response.dto';
-import { StatisticPayload } from '../types';
+import { StatisticPayload, UpdateIncome } from '../types';
 
 @Injectable()
 export class IncomesService {
@@ -15,6 +19,33 @@ export class IncomesService {
     private incomeCategory: Model<IncomeCategory>,
     @InjectModel(Income.name) private income: Model<Income>,
   ) {}
+
+  async updateIncome(payload: UpdateIncome) {
+    const { userId, incomeId, date, income_category, amount } = payload;
+    const isIncomeExists = await this.getIncomeCategoryById(
+      payload.income_category,
+    );
+    if (!isIncomeExists)
+      throw new BadRequestException("Income category doesn't exists");
+    const updated = await this.income
+      .findOneAndUpdate(
+        {
+          owner: userId,
+          _id: incomeId,
+        },
+        {
+          date,
+          income_category,
+          amount,
+        },
+        { new: true },
+      )
+      .populate('income_category')
+      .select('-owner -__v')
+      .exec();
+    if (!updated) throw new NotFoundException("Income doesn't exists");
+    return updated;
+  }
 
   async createIncome(payload: CreateIncomeDto, userId: string) {
     const isIncomeExists = await this.getIncomeCategoryById(

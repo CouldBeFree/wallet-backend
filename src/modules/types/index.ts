@@ -14,3 +14,11 @@ export type QueryParams = {
   page: number;
   pageSize: number;
 };
+
+export type UpdateIncome = {
+  userId: string;
+  incomeId: string;
+  income_category: string;
+  amount: number;
+  date: string;
+};

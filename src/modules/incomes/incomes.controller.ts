@@ -6,7 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
-  Query,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { IncomesService } from './incomes.service';
@@ -16,7 +16,7 @@ import { CreateIncomeDto } from './dto/create-income.dto';
 import { CurrentUser } from '../../decorators/currentUser';
 import { CreateIncomeResponseDto } from './dto/create-income-response.dto';
 import { StatisticParams } from '../../decorators/statisticParams';
-import { QueryParams } from '../types';
+import { QueryParams, UpdateIncome } from '../types';
 
 @Controller('/api/incomes')
 export class IncomesController {
@@ -26,6 +26,17 @@ export class IncomesController {
   @UseGuards(AuthGuard)
   async getCategories(): Promise<IncomesCategoriesDto[]> {
     return await this.incomesService.getAllExpenseCategories();
+  }
+
+  @Put(':id')
+  @UseGuards(AuthGuard)
+  async updateIncome(
+    @Body() createIncomeDto: CreateIncomeDto,
+    @CurrentUser() userId: string,
+    @Param('id') incomeId: string,
+  ) {
+    const payload: UpdateIncome = { userId, incomeId, ...createIncomeDto };
+    return await this.incomesService.updateIncome(payload);
   }
 
   @Post()
