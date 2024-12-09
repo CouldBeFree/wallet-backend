@@ -22,3 +22,11 @@ export type UpdateIncome = {
   amount: number;
   date: string;
 };
+
+export type UpdateExpense = {
+  userId: string;
+  incomeId: string;
+  expense_category: string;
+  amount: number;
+  date: string;
+};

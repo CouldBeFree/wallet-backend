@@ -8,6 +8,7 @@ import {
   Delete,
   Param,
   NotFoundException,
+  Put,
 } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { ExpensesCategoriesDto } from './dto/expenses-categories.dto';
@@ -15,6 +16,8 @@ import { AuthGuard } from '../../guards/auth.guard';
 import { CreateExpenseCategoryDto } from './dto/create-expense-category.dto';
 import { CurrentUser } from '../../decorators/currentUser';
 import { CreateExpenseCategoryResponseDto } from './dto/create-expense-category-reponse.dto';
+import { QueryParams, UpdateExpense, UpdateIncome } from '../types';
+import { StatisticParams } from '../../decorators/statisticParams';
 
 @Controller('/api/expenses')
 export class ExpensesController {
@@ -39,16 +42,29 @@ export class ExpensesController {
     );
   }
 
+  @Put('id')
+  @UseGuards(AuthGuard)
+  async updateExpense(
+    @Body() createExpenseCategory: CreateExpenseCategoryDto,
+    @CurrentUser() userId: string,
+    @Param('id') incomeId: string,
+  ) {
+    const payload: UpdateExpense = {
+      userId,
+      incomeId,
+      ...createExpenseCategory,
+    };
+    return await this.expenseService.updateIncome(payload);
+  }
+
   @Get()
   @UseGuards(AuthGuard)
   async getAllExpenses(
     @CurrentUser() userId: string,
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string,
+    @StatisticParams() params: QueryParams,
   ) {
-    const pageNumber = parseInt(page) || 1;
-    const size = parseInt(pageSize) || 10;
-    return await this.expenseService.getAllExpenses(userId, pageNumber, size);
+    const payload = { ...params, userId };
+    return await this.expenseService.getAllExpenses(payload);
   }
 
   @Get('categories')

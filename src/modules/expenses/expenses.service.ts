@@ -1,10 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ExpensesCategoriesDto } from './dto/expenses-categories.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ExpenseCategory } from './schemas/ExpenseCategory.schema';
 import { CreateExpenseCategoryDto } from './dto/create-expense-category.dto';
 import { Expense } from './schemas/Expense.schema';
+import { StatisticPayload, UpdateExpense } from '../types';
 
 @Injectable()
 export class ExpensesService {
@@ -35,25 +40,38 @@ export class ExpensesService {
     }
   }
 
-  async getAllExpenses(userId: string, page: number, pageSize: number) {
-    const skip = (page - 1) * pageSize;
-    const res = await this.expense
-      .find({ owner: userId })
-      .skip(skip)
-      .limit(pageSize)
+  async getAllExpenses(payload: StatisticPayload) {
+    const { userId, startDate, endDate } = payload;
+    return await this.expense
+      .find({ owner: userId, date: { $gte: startDate, $lte: endDate } })
+      .sort({ date: -1 })
       .populate('expense_category')
       .exec();
+  }
 
-    const total = await this.expense.countDocuments({ owner: userId });
-    return {
-      data: res,
-      metadata: {
-        total,
-        page,
-        pageSize,
-        totalPages: Math.ceil(total / pageSize),
-      },
-    };
+  async updateIncome(value: UpdateExpense) {
+    const { userId, incomeId, date, expense_category, amount } = value;
+    const isIncomeExists = await this.getExpenseCategoryById(expense_category);
+    if (!isIncomeExists)
+      throw new BadRequestException("Expense category doesn't exists");
+    const updated = await this.expense
+      .findOneAndUpdate(
+        {
+          owner: userId,
+          _id: incomeId,
+        },
+        {
+          date,
+          expense_category,
+          amount,
+        },
+        { new: true },
+      )
+      .populate('expense_category')
+      .select('-owner -__v')
+      .exec();
+    if (!updated) throw new NotFoundException("Expense doesn't exists");
+    return updated;
   }
 
   private async getExpenseCategoryById(id: string) {
