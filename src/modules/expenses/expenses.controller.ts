@@ -4,7 +4,6 @@ import {
   Get,
   Post,
   UseGuards,
-  Query,
   Delete,
   Param,
   NotFoundException,
@@ -16,7 +15,7 @@ import { AuthGuard } from '../../guards/auth.guard';
 import { CreateExpenseCategoryDto } from './dto/create-expense-category.dto';
 import { CurrentUser } from '../../decorators/currentUser';
 import { CreateExpenseCategoryResponseDto } from './dto/create-expense-category-reponse.dto';
-import { QueryParams, UpdateExpense, UpdateIncome } from '../types';
+import { QueryParams, UpdateExpense } from '../types';
 import { StatisticParams } from '../../decorators/statisticParams';
 
 @Controller('/api/expenses')
@@ -42,7 +41,7 @@ export class ExpensesController {
     );
   }
 
-  @Put('id')
+  @Put(':id')
   @UseGuards(AuthGuard)
   async updateExpense(
     @Body() createExpenseCategory: CreateExpenseCategoryDto,
