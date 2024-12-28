@@ -16,6 +16,9 @@ export class Expense {
 
   @Prop({ type: Date, required: true })
   date: Date;
+
+  @Prop({ required: false })
+  comment: string;
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(Expense);

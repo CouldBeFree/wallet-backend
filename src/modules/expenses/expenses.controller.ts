@@ -24,7 +24,7 @@ export class ExpensesController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async createCategory(
+  async createExpense(
     @Body() createExpenseCategory: CreateExpenseCategoryDto,
     @CurrentUser() userId: string,
   ): Promise<CreateExpenseCategoryResponseDto> {
@@ -38,6 +38,7 @@ export class ExpensesController {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       res.expense_category?.name,
+      res.comment,
     );
   }
 

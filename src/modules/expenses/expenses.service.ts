@@ -32,6 +32,7 @@ export class ExpensesService {
         expense_category: payload.expense_category,
         amount: payload.amount,
         date: new Date(payload.date),
+        comment: payload?.comment || null,
       });
       const result = await expense.save();
       return await result.populate('expense_category');
