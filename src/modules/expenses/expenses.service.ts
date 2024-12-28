@@ -51,7 +51,7 @@ export class ExpensesService {
   }
 
   async updateIncome(value: UpdateExpense) {
-    const { userId, incomeId, date, expense_category, amount } = value;
+    const { userId, incomeId, date, expense_category, amount, comment } = value;
     const isIncomeExists = await this.getExpenseCategoryById(expense_category);
     if (!isIncomeExists)
       throw new BadRequestException("Expense category doesn't exists");
@@ -65,6 +65,7 @@ export class ExpensesService {
           date,
           expense_category,
           amount,
+          comment,
         },
         { new: true },
       )

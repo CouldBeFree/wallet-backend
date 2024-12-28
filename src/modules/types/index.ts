@@ -29,4 +29,5 @@ export type UpdateExpense = {
   expense_category: string;
   amount: number;
   date: string;
+  comment: string | null;
 };
