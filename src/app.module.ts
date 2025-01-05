@@ -12,9 +12,7 @@ require('dotenv').config();
 @Module({
   imports: [
     UserModule,
-    MongooseModule.forRoot(
-      process.env.MONGO_DB_URL || 'mongodb://localhost:27017/wallet_watch',
-    ),
+    MongooseModule.forRoot(process.env.MONGO_DB_URL),
     AuthModule,
     ExpensesModule,
     IncomesModule,
