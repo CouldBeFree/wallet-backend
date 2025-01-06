@@ -31,3 +31,8 @@ export type UpdateExpense = {
   date: string;
   comment: string | null;
 };
+
+export type GetExpense = {
+  userId: string;
+  expenseCategoryId: string;
+};

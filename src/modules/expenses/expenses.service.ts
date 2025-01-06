@@ -9,7 +9,8 @@ import { Model } from 'mongoose';
 import { ExpenseCategory } from './schemas/ExpenseCategory.schema';
 import { CreateExpenseCategoryDto } from './dto/create-expense-category.dto';
 import { Expense } from './schemas/Expense.schema';
-import { StatisticPayload, UpdateExpense } from '../types';
+import { ExpenseAggregationResult } from './types';
+import { GetExpense, StatisticPayload, UpdateExpense } from '../types';
 
 @Injectable()
 export class ExpensesService {
@@ -91,6 +92,60 @@ export class ExpensesService {
       response.push(categoryData);
     });
     return response;
+  }
+
+  async getCategory(id: string) {
+    try {
+      return await this.expenseCategory.findById(id);
+    } catch (e) {
+      throw new BadRequestException(e.message());
+    }
+  }
+
+  async getExpense(value: GetExpense): Promise<ExpenseAggregationResult[]> {
+    const { userId, expenseCategoryId } = value;
+    try {
+      return await this.expense.aggregate([
+        {
+          $match: {
+            owner: userId,
+            expense_category: expenseCategoryId,
+          },
+        },
+        {
+          $addFields: {
+            expense_category: { $toObjectId: '$expense_category' },
+          },
+        },
+        {
+          $lookup: {
+            from: 'expense_category',
+            localField: 'expense_category',
+            foreignField: '_id',
+            as: 'categoryDetails',
+          },
+        },
+        {
+          $unwind: '$categoryDetails',
+        },
+        {
+          $group: {
+            _id: 'owner',
+            totalAmount: { $sum: '$amount' },
+            categoryName: { $first: '$categoryDetails.name' },
+          },
+        },
+        {
+          $project: {
+            expense: '$categoryName',
+            _id: 0,
+            totalAmount: 1,
+          },
+        },
+      ]);
+    } catch (e) {
+      throw new BadRequestException(e.message());
+    }
   }
 
   async removeExpense(id: string) {

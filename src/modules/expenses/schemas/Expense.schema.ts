@@ -19,6 +19,9 @@ export class Expense {
 
   @Prop({ required: false })
   comment: string;
+
+  @Prop({ required: false, type: Types.ObjectId, ref: 'ExpenseSubCategory' })
+  expense_sub_category_id: string;
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(Expense);

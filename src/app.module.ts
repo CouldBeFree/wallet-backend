@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { IncomesModule } from './modules/incomes/incomes.module';
 import { StatisticModule } from './modules/statistic/statistic.module';
+import { ExpenseSubCategoryModule } from './modules/expense-sub-category/expense-sub-category.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -17,6 +18,7 @@ require('dotenv').config();
     ExpensesModule,
     IncomesModule,
     StatisticModule,
+    ExpenseSubCategoryModule,
   ],
   providers: [
     {
