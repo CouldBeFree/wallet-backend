@@ -10,12 +10,17 @@ import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '../user/constants';
 import { Expense, ExpenseSchema } from './schemas/Expense.schema';
+import {
+  ExpenseSubCategory,
+  ExpenseSubCategorySchema,
+} from '../expense-sub-category/schemas/ExpenseSubCategory.schema';
 
 @Module({
   imports: [
     UserModule,
     MongooseModule.forFeature([
       { name: ExpenseCategory.name, schema: ExpenseCategorySchema },
+      { name: ExpenseSubCategory.name, schema: ExpenseSubCategorySchema },
       { name: Expense.name, schema: ExpenseSchema },
     ]),
     JwtModule.register({

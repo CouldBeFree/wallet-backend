@@ -11,10 +11,13 @@ import { CreateExpenseCategoryDto } from './dto/create-expense-category.dto';
 import { Expense } from './schemas/Expense.schema';
 import { ExpenseAggregationResult } from './types';
 import { GetExpense, StatisticPayload, UpdateExpense } from '../types';
+import { ExpenseSubCategory } from '../expense-sub-category/schemas/ExpenseSubCategory.schema';
 
 @Injectable()
 export class ExpensesService {
   constructor(
+    @InjectModel(ExpenseSubCategory.name)
+    private expenseSubCategory: Model<ExpenseSubCategory>,
     @InjectModel(ExpenseCategory.name)
     private expenseCategory: Model<ExpenseCategory>,
     @InjectModel(Expense.name)
@@ -27,6 +30,17 @@ export class ExpensesService {
     );
     if (!isExpenseCategoryExists)
       throw new BadRequestException("Expense category doesn't exists");
+    if (payload.expense_sub_category_id) {
+      const isSubCategoryExists = await this.expenseSubCategory.findOne({
+        $and: [
+          { owner: userId },
+          { expense_category: payload.expense_category },
+          { _id: payload.expense_sub_category_id },
+        ],
+      });
+      if (!isSubCategoryExists)
+        throw new BadRequestException('Sub category does not exists');
+    }
     try {
       const expense = new this.expense({
         owner: userId,
@@ -82,16 +96,27 @@ export class ExpensesService {
   }
 
   async getAllExpenseCategories(): Promise<ExpensesCategoriesDto[]> {
-    const document = await this.expenseCategory.find();
-    const response = [];
-    document.forEach((el) => {
-      const categoryData = new ExpensesCategoriesDto(
-        el._id.toString(),
-        el.name,
-      );
-      response.push(categoryData);
-    });
-    return response;
+    return this.expenseCategory.aggregate([
+      {
+        $lookup: {
+          from: 'expense_sub_category',
+          let: { category_id: '$_id' },
+          pipeline: [
+            {
+              $addFields: {
+                expense_category: { $toObjectId: '$expense_category' },
+              },
+            },
+            {
+              $match: {
+                $expr: { $eq: ['$expense_category', '$$category_id'] },
+              },
+            },
+          ],
+          as: 'sub_categories', // Alias for the joined data
+        },
+      },
+    ]);
   }
 
   async getCategory(id: string) {
