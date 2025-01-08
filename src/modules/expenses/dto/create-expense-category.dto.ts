@@ -17,5 +17,5 @@ export class CreateExpenseCategoryDto {
 
   @IsOptional()
   @IsString()
-  expense_sub_category_id: string;
+  expense_sub_category: string;
 }

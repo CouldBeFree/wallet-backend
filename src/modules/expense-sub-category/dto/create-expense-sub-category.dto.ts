@@ -1,5 +1,5 @@
 import { IsObjectId } from '../../../decorators/custom-validator/isObjectId';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateExpenseSubCategoryDto {
   @IsObjectId({ message: 'Expense category must be a valid MongoDB ObjectId' })
@@ -7,4 +7,8 @@ export class CreateExpenseSubCategoryDto {
 
   @IsString()
   name: string;
+
+  @IsOptional()
+  @IsString()
+  expense_category_icon: string;
 }

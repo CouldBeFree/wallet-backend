@@ -30,7 +30,10 @@ export class ExpenseSubCategoryController {
     @Body() value: CreateExpenseSubCategoryDto,
     @CurrentUser() userId: string,
   ) {
-    const payload: CreateSubCategory = { ...value, owner: userId };
+    const payload: CreateSubCategory = {
+      ...value,
+      owner: userId,
+    };
     await this.expenseSubCategoryService.getCategory(userId);
     return await this.expenseSubCategoryService.createSubCategory(payload);
   }
@@ -59,6 +62,7 @@ export class ExpenseSubCategoryController {
       name: data.name,
       owner: userId,
       expenseSubId,
+      expense_category_icon: data.expense_category_icon,
     };
     return await this.expenseSubCategoryService.updateSubCategory(value);
   }
@@ -75,4 +79,13 @@ export class ExpenseSubCategoryController {
     };
     return this.expenseSubCategoryService.getSubCategories(value);
   }
+
+  // @Get(':id')
+  // @UseGuards(AuthGuard)
+  // async getSubCategoriesByCategory(
+  //   @CurrentUser() userId: string,
+  //   @Param('id') categoryId: string,
+  // ) {
+  //   return categoryId;
+  // }
 }

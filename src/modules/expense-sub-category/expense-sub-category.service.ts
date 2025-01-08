@@ -45,7 +45,7 @@ export class ExpenseSubCategoryService {
   async createSubCategory(payload: CreateSubCategory) {
     const isExists = await this.getSubCategory(payload);
     if (isExists) throw new BadRequestException('Sub category already exists');
-    const { expense_category, name, owner } = payload;
+    const { expense_category, name, owner, expense_category_icon } = payload;
     const isCategoryExists = await this.getCategory(expense_category);
     if (!isCategoryExists)
       throw new BadRequestException('Expense category does not exists');
@@ -54,6 +54,7 @@ export class ExpenseSubCategoryService {
         expense_category,
         name,
         owner,
+        expense_category_icon,
       });
       return await expense.save();
     } catch (e) {
@@ -77,7 +78,7 @@ export class ExpenseSubCategoryService {
   }
 
   async updateSubCategory(payload: UpdateSubCategory) {
-    const { owner, name, expenseSubId } = payload;
+    const { owner, name, expenseSubId, expense_category_icon } = payload;
     const result = await this.expenseSubCategory
       .findOneAndUpdate(
         {
@@ -86,6 +87,7 @@ export class ExpenseSubCategoryService {
         },
         {
           name,
+          expense_category_icon,
         },
         { new: true },
       )

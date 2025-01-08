@@ -13,6 +13,9 @@ export class ExpenseSubCategory {
 
   @Prop({ type: Types.ObjectId, ref: 'ExpenseCategory', required: true })
   expense_category: string;
+
+  @Prop({ required: false })
+  expense_category_icon: string;
 }
 
 export const ExpenseSubCategorySchema =

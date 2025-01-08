@@ -30,12 +30,12 @@ export class ExpensesService {
     );
     if (!isExpenseCategoryExists)
       throw new BadRequestException("Expense category doesn't exists");
-    if (payload.expense_sub_category_id) {
+    if (payload.expense_sub_category) {
       const isSubCategoryExists = await this.expenseSubCategory.findOne({
         $and: [
           { owner: userId },
           { expense_category: payload.expense_category },
-          { _id: payload.expense_sub_category_id },
+          { _id: payload.expense_sub_category },
         ],
       });
       if (!isSubCategoryExists)
@@ -47,7 +47,10 @@ export class ExpensesService {
         expense_category: payload.expense_category,
         amount: payload.amount,
         date: new Date(payload.date),
-        comment: payload?.comment || null,
+        ...(payload.expense_sub_category && {
+          expense_sub_category: payload.expense_sub_category,
+        }),
+        ...(payload.comment && { comment: payload.comment }),
       });
       const result = await expense.save();
       return await result.populate('expense_category');
@@ -62,6 +65,8 @@ export class ExpensesService {
       .find({ owner: userId, date: { $gte: startDate, $lte: endDate } })
       .sort({ date: -1 })
       .populate('expense_category')
+      .populate('expense_sub_category', '_id name')
+      .select('-owner -__v')
       .exec();
   }
 

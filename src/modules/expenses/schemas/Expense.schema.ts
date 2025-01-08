@@ -21,7 +21,7 @@ export class Expense {
   comment: string;
 
   @Prop({ required: false, type: Types.ObjectId, ref: 'ExpenseSubCategory' })
-  expense_sub_category_id: string;
+  expense_sub_category: string;
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(Expense);
