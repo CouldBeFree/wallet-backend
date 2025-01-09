@@ -14,4 +14,8 @@ export class CreateExpenseCategoryDto {
   @IsOptional()
   @IsString()
   comment: string;
+
+  @IsOptional()
+  @IsString()
+  expense_sub_category: string;
 }

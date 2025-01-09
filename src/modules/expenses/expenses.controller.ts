@@ -73,6 +73,25 @@ export class ExpensesController {
     return await this.expenseService.getAllExpenseCategories();
   }
 
+  @Get(':id')
+  @UseGuards(AuthGuard)
+  async getExpense(
+    @Param('id') expenseCategoryId: string,
+    @CurrentUser() userId: string,
+  ) {
+    const payload = { userId, expenseCategoryId };
+    const cat = await this.expenseService.getCategory(expenseCategoryId);
+    if (!cat) throw new NotFoundException('Category not found');
+    const data = await this.expenseService.getExpense(payload);
+    if (!data.length) {
+      return {
+        totalAmount: 0,
+        expense: cat.name,
+      };
+    }
+    return data[0];
+  }
+
   @Delete(':id')
   @UseGuards(AuthGuard)
   async removeExpense(
