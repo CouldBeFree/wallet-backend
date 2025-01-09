@@ -48,7 +48,7 @@ export class ExpenseSubCategoryController {
       owner: userId,
       expense_sub_category: expenseSubId,
     };
-    await this.expenseSubCategoryService.removeSubCategory(value);
+    await this.expenseSubCategoryService.removeSubCategory(value, true);
   }
 
   @Put(':id')
@@ -79,13 +79,4 @@ export class ExpenseSubCategoryController {
     };
     return this.expenseSubCategoryService.getSubCategories(value);
   }
-
-  // @Get(':id')
-  // @UseGuards(AuthGuard)
-  // async getSubCategoriesByCategory(
-  //   @CurrentUser() userId: string,
-  //   @Param('id') categoryId: string,
-  // ) {
-  //   return categoryId;
-  // }
 }

@@ -44,7 +44,20 @@ export class ExpenseSubCategoryService {
 
   async createSubCategory(payload: CreateSubCategory) {
     const isExists = await this.getSubCategory(payload);
-    if (isExists) throw new BadRequestException('Sub category already exists');
+    if (isExists && !isExists.removed) {
+      throw new BadRequestException('Sub category already exists');
+    } else if (isExists && isExists.removed) {
+      return this.expenseSubCategory.findByIdAndUpdate(
+        isExists._id,
+        {
+          removed: false,
+        },
+        {
+          new: true,
+          returnDocument: 'after',
+        },
+      );
+    }
     const { expense_category, name, owner, expense_category_icon } = payload;
     const isCategoryExists = await this.getCategory(expense_category);
     if (!isCategoryExists)
@@ -54,7 +67,7 @@ export class ExpenseSubCategoryService {
         expense_category,
         name,
         owner,
-        expense_category_icon,
+        expense_category_icon: expense_category_icon || null,
       });
       return await expense.save();
     } catch (e) {
@@ -62,14 +75,19 @@ export class ExpenseSubCategoryService {
     }
   }
 
-  async removeSubCategory(payload: RemoveSubCategory) {
+  async removeSubCategory(payload: RemoveSubCategory, remove: boolean) {
     const { owner, expense_sub_category } = payload;
-    const result = await this.expenseSubCategory.findOneAndDelete({
-      $and: [
-        { owner: owner },
-        { _id: new Types.ObjectId(expense_sub_category) },
-      ],
-    });
+    const result = await this.expenseSubCategory.findOneAndUpdate(
+      {
+        $and: [
+          { owner: owner },
+          { _id: new Types.ObjectId(expense_sub_category) },
+        ],
+      },
+      {
+        removed: true,
+      },
+    );
 
     if (!result) {
       throw new NotFoundException('Expense sub-category not found');
@@ -102,7 +120,7 @@ export class ExpenseSubCategoryService {
     const { owner, expense_category } = value;
     return this.expenseSubCategory
       .find({
-        $and: [{ owner }, { expense_category }],
+        $and: [{ owner }, { expense_category }, { removed: false }],
       })
       .populate('expense_category')
       .select('-owner -__v')

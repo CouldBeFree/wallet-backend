@@ -16,6 +16,9 @@ export class ExpenseSubCategory {
 
   @Prop({ required: false })
   expense_category_icon: string;
+
+  @Prop({ default: false, select: true })
+  removed: boolean;
 }
 
 export const ExpenseSubCategorySchema =

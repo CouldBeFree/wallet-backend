@@ -115,10 +115,16 @@ export class ExpensesService {
             {
               $match: {
                 $expr: { $eq: ['$expense_category', '$$category_id'] },
+                removed: { $ne: true },
+              },
+            },
+            {
+              $project: {
+                removed: 0,
               },
             },
           ],
-          as: 'sub_categories', // Alias for the joined data
+          as: 'sub_categories',
         },
       },
     ]);
