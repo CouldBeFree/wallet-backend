@@ -30,6 +30,7 @@ export type UpdateExpense = {
   amount: number;
   date: string;
   comment: string | null;
+  expense_sub_category: string;
 };
 
 export type GetExpense = {
