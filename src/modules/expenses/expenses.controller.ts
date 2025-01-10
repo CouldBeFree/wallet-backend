@@ -54,7 +54,7 @@ export class ExpensesController {
       incomeId,
       ...createExpenseCategory,
     };
-    return await this.expenseService.updateIncome(payload);
+    return await this.expenseService.updateExpense(payload);
   }
 
   @Get()
